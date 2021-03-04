@@ -780,7 +780,7 @@ class OAuth2Validator(RequestValidator):
             "alg": request.client.algorithm,
         }
         # PyJWKClient expects a kid in the header for varifying the token
-        if request.client.algorithm == oauth2_settings.OIDC_RSA_PRIVATE_KEY:
+        if request.client.algorithm == AbstractApplication.RS256_ALGORITHM:
             header["kid"] = request.client.jwk_key.thumbprint()
 
         jwt_token = jwt.JWT(
