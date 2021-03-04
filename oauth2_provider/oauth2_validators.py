@@ -774,8 +774,17 @@ class OAuth2Validator(RequestValidator):
         if "nonce" not in id_token and request.nonce:
             id_token["nonce"] = request.nonce
 
+
+        header = {
+            "typ": "JWT",
+            "alg": request.client.algorithm,
+        }
+        # PyJWKClient expects a kid in the header for varifying the token
+        if request.client.algorithm == settings.OIDC_RSA_PRIVATE_KEY:
+            header["kid"] = request.client.jwk_key.thumbprint()
+
         jwt_token = jwt.JWT(
-            header=json.dumps({"alg": request.client.algorithm}, default=str),
+            header=json.dumps(header, default=str),
             claims=json.dumps(id_token, default=str),
         )
         jwt_token.make_signed_token(request.client.jwk_key)
